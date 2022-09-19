@@ -43,11 +43,14 @@ def main():
 
         specs = []
         for spec_url in SPEC_URLS:
-            specs.append(
-                cache.spec.get(spec_url) or cache.spec.setdefault(
-                    spec_url, session.get(spec_url).json()
+            try:
+                specs.append(
+                    cache.spec.get(spec_url) or cache.spec.setdefault(
+                        spec_url, session.get(spec_url).json()
+                    )
                 )
-            )
+            except:
+                pass
 
         args = parse_args(specs=specs)
         if getattr(args, 'dry_run', False):
