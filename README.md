@@ -23,6 +23,7 @@ Initial setup:
 export OPENAPI_CLI_BASE_URL='https://api-base-url'
 export OPENAPI_CLI_VERIFY='false|true'
 export OPENAPI_CLI_SPEC_URLS='https://spec-url1;https://spec-url2;...'
+export OPENAPI_CLI_AUTH_PLUGIN='openapi_cli.auth.Decs3O'
 
 openapi-cli -h
 ```
@@ -35,3 +36,12 @@ openapi-cli --invalidate-cache
 ## How to generate a CLI-client stub:
 
 Using another tool like https://github.com/OpenAPITools
+
+## How to implement custom authentication plugin:
+
+```python
+import openapi_cli.auth.abstract
+
+class MyAuth(openapi_cli.auth.abstract.AbstractAuth):
+    ...
+```

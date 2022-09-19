@@ -6,16 +6,16 @@ import urllib3
 import requests
 import six
 
-from openapi_cli.auth import Decs3O
 from openapi_cli.cache import Cache
 from openapi_cli.parser import parse_args
+from openapi_cli.utils import import_object
 
 input = six.moves.input
 urlparse = six.moves.urllib.parse
 
 BASE_URL = os.getenv('OPENAPI_CLI_BASE_URL')
-
 SPEC_URLS = os.getenv('OPENAPI_CLI_SPEC_URLS', '').split(';')
+AUTH_PLUGIN = os.getenv('OPENAPI_CLI_AUTH_PLUGIN')
 VERIFY = os.getenv('OPENAPI_CLI_VERIFY', 'True').lower() in ['true', '1', 't', 'y', 'yes']
 
 SUCCESS_CODES = [200, 201]
@@ -32,11 +32,13 @@ def main():
     session = requests.Session()
     session.verify = VERIFY
 
+    AuthClass = import_object(path=AUTH_PLUGIN)
+
     with Cache() as cache:
         if cache.auth.get('kwargs'):
-            session.auth = Decs3O(**cache.auth['kwargs'])
+            session.auth = AuthClass(**cache.auth['kwargs'])
         else:
-            session.auth = Decs3O.from_creds_user_input(verify=VERIFY)
+            session.auth = AuthClass.from_creds_user_input(verify=VERIFY)
             cache.auth['kwargs'] = session.auth.kwargs
 
         specs = []
