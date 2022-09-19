@@ -14,7 +14,7 @@ from openapi_cli.tests.specs import TEST_SPEC_YAML
 ])
 def test_parse_args(monkeypatch, sys_argv):
     monkeypatch.setattr('sys.argv', sys_argv)
-    parse_args(TEST_SPEC_YAML['paths'])
+    parse_args([TEST_SPEC_YAML])
 
 
 @pytest.mark.parametrize("sys_argv", [
@@ -23,13 +23,23 @@ def test_parse_args(monkeypatch, sys_argv):
 ])
 def test_parse_args_dry_run(monkeypatch, sys_argv):
     monkeypatch.setattr('sys.argv', sys_argv)
-    parse_args(TEST_SPEC_YAML['paths'])
+    parse_args([TEST_SPEC_YAML])
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason='')
 @pytest.mark.parametrize("sys_argv", [
-    ['openapi-cli', '--dry-run'],
+    ['openapi-cli', 'get'],
+    ['openapi-cli', 'post'],
 ])
-def test_parse_args_dry_run_2(monkeypatch, sys_argv):
+def test_parse_args_get_path_no_chain(monkeypatch, sys_argv):
     monkeypatch.setattr('sys.argv', sys_argv)
-    parse_args(TEST_SPEC_YAML['paths'])
+    args = parse_args([TEST_SPEC_YAML])
+
+    assert args.path == '/'
+
+
+def test_parse_args_no_args(monkeypatch):
+    monkeypatch.setattr('sys.argv', ['openapi-cli'])
+    with pytest.raises(SystemExit) as e:
+        parse_args([TEST_SPEC_YAML])
+
+        assert e.value.code == 2

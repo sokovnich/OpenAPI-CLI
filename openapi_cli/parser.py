@@ -8,7 +8,7 @@ urlparse = six.moves.urllib.parse
 def parse_args(specs):
     main_parser = ArgumentParser(add_help=True)
     main_container = main_parser.add_subparsers(help='API entry points')
-    main_container.required = False
+    main_container.required = True
 
     setup_parser = main_container.add_parser('mngmt', help='OpenAPI-CLI management commands')
     setup_parser.add_argument(
@@ -64,11 +64,18 @@ def parse_args(specs):
                     )
 
     args = main_parser.parse_args(namespace=Namespace())
-    endpoint = tuple(name for i, name in sorted(vars(args.chain).items()))
-    args.path = urlparse.urljoin(
-        base_path_map[endpoint],
-        '/'.join(endpoint)
+    endpoint = (
+        tuple()
+        if not hasattr(args, 'chain') or getattr(args.chain, 'i0', None) is None
+        else tuple(name for i, name in sorted(vars(args.chain).items()))
     )
+    base_path = base_path_map.get(endpoint, '')
+
+    if base_path:
+        args.path = urlparse.urljoin(base_path, '/'.join(endpoint))
+    else:
+        # workaround to set correct method for / endpoint (i.e. if no endpoint path supplied)
+        args.path = '/'
 
     return args
 
