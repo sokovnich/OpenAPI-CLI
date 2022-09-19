@@ -39,6 +39,8 @@ def main():
             session.auth = AuthClass(**cache.auth['kwargs'])
         else:
             session.auth = AuthClass.from_creds_user_input(verify=VERIFY)
+
+        if cache.auth.get('kwargs', '') != session.auth.kwargs:
             cache.auth['kwargs'] = session.auth.kwargs
 
         specs = []

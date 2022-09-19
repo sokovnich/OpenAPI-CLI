@@ -4,12 +4,18 @@ from openapi_cli.auth.abstract import AbstractAuth, input
 
 
 class Decs3O(AbstractAuth):
-    def __init__(self, token):
-        self.token = token
+    def __init__(self, token, refresh_token_url, verify=True):
+        self.id_token = token
+        self.refresh_token_url = refresh_token_url
+        self.verify = verify
 
     @property
     def kwargs(self):
-        return {'token': self.token}
+        return {
+            'token': self.id_token,
+            'refresh_token_url': self.refresh_token_url,
+            'verify': self.verify,
+        }
 
     @classmethod
     def input_creds(cls):
@@ -33,12 +39,32 @@ class Decs3O(AbstractAuth):
             id_token_url=id_token_url,
             verify=verify,
         )
-        return cls(token=token)
+        return cls(
+            token=token,
+            refresh_token_url='{}/refresh'.format(id_token_url),
+            verify=verify,
+        )
 
-    def __call__(self, r):
-        r.headers['Authorization'] = 'Bearer {}'.format(self.token)
+    def set_auth_header(self, r):
+        r.headers['Authorization'] = 'Bearer {}'.format(self.id_token)
 
-        return r
+    def handle_401(self, response, **kwargs):
+        if response.status_code == 401:
+            # consume content to reuse connection for the next request
+            response.content
+            response.raw.release_conn()
+            response.close()
+
+            _request = response.request.copy()
+            self.refresh_jwt_token()
+            self.set_auth_header(r=_request)
+
+            _response = response.connection.send(_request, **kwargs)
+            _response.history.append(response)
+            _response.request = _request
+
+            return _response
+        return response
 
     @staticmethod
     def get_jwt_token(
@@ -62,9 +88,27 @@ class Decs3O(AbstractAuth):
             '{id_token_url}?scope=user:memberOf:{clientid}:{scope}'.format(
                 id_token_url=id_token_url,
                 clientid=client_id,
-                scope=''.join(token['scope']),
+                scope=token['scope']+'offline_access',
             ),
             headers={'Authorization': 'token {}'.format(token['access_token'])},
             verify=verify,
         )
+        assert response.status_code == 200
+
         return response.text
+
+    def refresh_jwt_token(self):
+        response = requests.get(
+            url=self.refresh_token_url,
+            headers={'Authorization': 'bearer {}'.format(self.id_token)},
+            verify=self.verify,
+        )
+        assert response.status_code == 200
+
+        self.id_token = response.text
+
+    def __call__(self, r):
+        self.set_auth_header(r=r)
+        r.register_hook("response", self.handle_401)
+
+        return r

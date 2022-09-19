@@ -11,4 +11,8 @@ def test_decs3o(mocker):
         )
     ).kwargs
 
-    assert Decs3O(**kwargs).kwargs == kwargs == {'token': 'some.jwt.token'}
+    assert Decs3O(**kwargs).kwargs == kwargs == {
+        'token': 'some.jwt.token',
+        'refresh_token_url': 'id_token_url/refresh',
+        'verify': False,
+    }
