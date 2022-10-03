@@ -32,16 +32,17 @@ def main():
     session = requests.Session()
     session.verify = VERIFY
 
-    AuthClass = import_object(path=AUTH_PLUGIN)
+    AuthClass = AUTH_PLUGIN and import_object(path=AUTH_PLUGIN)
 
     with Cache() as cache:
-        if cache.auth.get('kwargs'):
-            session.auth = AuthClass(**cache.auth['kwargs'])
-        else:
-            session.auth = AuthClass.from_creds_user_input(verify=VERIFY)
+        if AuthClass:
+            if cache.auth.get('kwargs'):
+                session.auth = AuthClass(**cache.auth['kwargs'])
+            else:
+                session.auth = AuthClass.from_creds_user_input(verify=VERIFY)
 
-        if cache.auth.get('kwargs', '') != session.auth.kwargs:
-            cache.auth['kwargs'] = session.auth.kwargs
+            if cache.auth.get('kwargs', {}) != session.auth.kwargs:
+                cache.auth['kwargs'] = session.auth.kwargs
 
         specs = []
         for spec_url in SPEC_URLS:
