@@ -30,7 +30,7 @@ openapi-cli -h
 
 Clear spec/authorization cache:
 ```bash
-openapi-cli --invalidate-cache
+openapi-cli mngmt --invalidate-cache
 ```
 
 Enable debug logging:
