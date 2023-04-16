@@ -33,6 +33,11 @@ Clear spec/authorization cache:
 openapi-cli --invalidate-cache
 ```
 
+Enable debug logging:
+```bash
+openapi-cli <arg1> <arg2> --debug
+```
+
 ## How to generate a CLI-client stub:
 
 Using another tool like https://github.com/OpenAPITools

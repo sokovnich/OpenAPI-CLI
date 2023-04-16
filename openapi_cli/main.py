@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import sys
 import urllib3
@@ -26,6 +27,15 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 assert BASE_URL, 'OPENAPI_CLI_BASE_URL env must be defined and contain root API endpoint'
 assert SPEC_URLS != [''], 'OPENAPI_CLI_SPEC_URLS env must be defined and contain OpenAPI spec urls separated by a semicolon'
+
+
+logging.basicConfig(
+    level=logging.WARNING,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.StreamHandler(),
+    ]
+)
 
 
 def main():
@@ -62,6 +72,9 @@ def main():
             print('OpenAPI-CLI cache was successfully invalidated')
             cache.invalidate()
             sys.exit()
+
+        if getattr(args, 'debug', False):
+            logging.getLogger().setLevel(logging.DEBUG)
 
         url = urlparse.urljoin(BASE_URL, args.path)
 

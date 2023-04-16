@@ -1,6 +1,14 @@
-import requests
+import logging
 
-from openapi_cli.auth.abstract import AbstractAuth, input
+import requests
+import six
+
+from openapi_cli.auth.abstract import AbstractAuth, log_request_curl
+
+
+logger = logging.getLogger()
+
+input = six.moves.input
 
 
 class Decs3O(AbstractAuth):
@@ -63,7 +71,10 @@ class Decs3O(AbstractAuth):
             _response.history.append(response)
             _response.request = _request
 
-            return _response
+            response = _response
+
+        log_request_curl(request=response.request)
+
         return response
 
     @staticmethod

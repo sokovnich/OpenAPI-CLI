@@ -89,6 +89,12 @@ class ArgumentParser(argparse.ArgumentParser):
             dest='dry_run',
             action='store_true'
         )
+        self.add_argument(
+            '--debug',
+            help='Enable debug logging',
+            dest='debug',
+            action='store_true'
+        )
 
 
 class Namespace(argparse.Namespace):

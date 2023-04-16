@@ -18,6 +18,15 @@ def test_parse_args(monkeypatch, sys_argv):
 
 
 @pytest.mark.parametrize("sys_argv", [
+    ['openapi-cli', 'get', '--debug'],
+    ['openapi-cli', 'v2', 'get', '--debug'],
+])
+def test_parse_args_debug(monkeypatch, sys_argv):
+    monkeypatch.setattr('sys.argv', sys_argv)
+    parse_args([TEST_SPEC_YAML])
+
+
+@pytest.mark.parametrize("sys_argv", [
     ['openapi-cli', 'get', '--dry-run'],
     ['openapi-cli', 'mngmt', '--invalidate-cache', '--dry-run'],
 ])
