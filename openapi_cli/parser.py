@@ -95,6 +95,12 @@ class ArgumentParser(argparse.ArgumentParser):
             dest='debug',
             action='store_true'
         )
+        self.add_argument(
+            '--color',
+            help='Enable color output',
+            dest='color',
+            action='store_true'
+        )
 
 
 class Namespace(argparse.Namespace):

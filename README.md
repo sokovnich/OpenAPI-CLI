@@ -38,6 +38,13 @@ Enable debug logging:
 openapi-cli <arg1> <arg2> --debug
 ```
 
+Enable color output:
+```bash
+pip install pygments
+
+openapi-cli <arg1> <arg2> --color
+```
+
 ## How to generate a CLI-client stub:
 
 Using another tool like https://github.com/OpenAPITools

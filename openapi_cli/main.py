@@ -9,7 +9,7 @@ import six
 
 from openapi_cli.cache import Cache
 from openapi_cli.parser import parse_args
-from openapi_cli.utils import import_object
+from openapi_cli.utils import import_object, highlight_json
 
 input = six.moves.input
 urlparse = six.moves.urllib.parse
@@ -81,7 +81,10 @@ def main():
         response = session.request(method=args.method, url=url, params=vars(args.kwargs) if hasattr(args, 'kwargs') else None)
 
         if response.status_code in SUCCESS_CODES:
-            print(json.dumps(response.json(), indent=4, sort_keys=True))
+            json_string = json.dumps(response.json(), indent=4, sort_keys=True)
+            if getattr(args, 'color', False):
+                json_string = highlight_json(json_string)
+            print(json_string)
         else:
             sys.exit(
                 'Server unexpectedly responds with code {}:'
