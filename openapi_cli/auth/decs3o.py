@@ -104,7 +104,7 @@ class Decs3O(AbstractAuth):
             headers={'Authorization': 'token {}'.format(token['access_token'])},
             verify=verify,
         )
-        assert response.status_code == 200
+        assert response.status_code == 200, "Cannot get JWT"
 
         return response.text
 
@@ -114,7 +114,7 @@ class Decs3O(AbstractAuth):
             headers={'Authorization': 'bearer {}'.format(self.id_token)},
             verify=self.verify,
         )
-        assert response.status_code == 200
+        assert response.status_code == 200, "Cannot refresh JWT"
 
         self.id_token = response.text
 
