@@ -51,9 +51,6 @@ def main():
             else:
                 session.auth = AuthClass.from_creds_user_input(verify=VERIFY)
 
-            if cache.auth.get('kwargs', {}) != session.auth.kwargs:
-                cache.auth['kwargs'] = session.auth.kwargs
-
         specs = []
         for spec_url in SPEC_URLS:
             try:
@@ -79,6 +76,10 @@ def main():
         url = urlparse.urljoin(BASE_URL, args.path)
 
         response = session.request(method=args.method, url=url, params=vars(args.kwargs) if hasattr(args, 'kwargs') else None)
+
+        # update auth cache
+        if cache.auth.get('kwargs', {}) != session.auth.kwargs:
+            cache.auth['kwargs'] = session.auth.kwargs
 
         if response.status_code in SUCCESS_CODES:
             json_string = json.dumps(response.json(), indent=4, sort_keys=True)
