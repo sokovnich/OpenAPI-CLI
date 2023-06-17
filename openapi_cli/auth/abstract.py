@@ -1,4 +1,5 @@
 import abc
+import logging
 
 import requests
 import six
@@ -35,3 +36,9 @@ class AbstractAuth(requests.auth.AuthBase):
     @abc.abstractmethod
     def __call__(self, r):
         return r
+
+
+def log_request_curl(request):
+    curl = "curl -X {method} -H {headers} -d '{data}' '{uri}'"
+    headers = " -H ".join('"{0}: {1}"'.format(k, v) for k, v in request.headers.items())
+    logging.debug(curl.format(method=request.method, headers=headers, data=request.body or "", uri=request.url))

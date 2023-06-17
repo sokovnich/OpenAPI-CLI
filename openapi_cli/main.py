@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import sys
 import urllib3
@@ -8,7 +9,7 @@ import six
 
 from openapi_cli.cache import Cache
 from openapi_cli.parser import parse_args
-from openapi_cli.utils import import_object
+from openapi_cli.utils import import_object, highlight_json
 
 input = six.moves.input
 urlparse = six.moves.urllib.parse
@@ -28,6 +29,15 @@ assert BASE_URL, 'OPENAPI_CLI_BASE_URL env must be defined and contain root API 
 assert SPEC_URLS != [''], 'OPENAPI_CLI_SPEC_URLS env must be defined and contain OpenAPI spec urls separated by a semicolon'
 
 
+logging.basicConfig(
+    level=logging.WARNING,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.StreamHandler(),
+    ]
+)
+
+
 def main():
     session = requests.Session()
     session.verify = VERIFY
@@ -40,9 +50,6 @@ def main():
                 session.auth = AuthClass(**cache.auth['kwargs'])
             else:
                 session.auth = AuthClass.from_creds_user_input(verify=VERIFY)
-
-            if cache.auth.get('kwargs', {}) != session.auth.kwargs:
-                cache.auth['kwargs'] = session.auth.kwargs
 
         specs = []
         for spec_url in SPEC_URLS:
@@ -63,12 +70,22 @@ def main():
             cache.invalidate()
             sys.exit()
 
+        if getattr(args, 'debug', False):
+            logging.getLogger().setLevel(logging.DEBUG)
+
         url = urlparse.urljoin(BASE_URL, args.path)
 
         response = session.request(method=args.method, url=url, params=vars(args.kwargs) if hasattr(args, 'kwargs') else None)
 
+        # update auth cache
+        if cache.auth.get('kwargs', {}) != session.auth.kwargs:
+            cache.auth['kwargs'] = session.auth.kwargs
+
         if response.status_code in SUCCESS_CODES:
-            print(json.dumps(response.json(), indent=4, sort_keys=True))
+            json_string = json.dumps(response.json(), indent=4, sort_keys=True)
+            if getattr(args, 'color', False):
+                json_string = highlight_json(json_string)
+            print(json_string)
         else:
             sys.exit(
                 'Server unexpectedly responds with code {}:'

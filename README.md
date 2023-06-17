@@ -30,7 +30,19 @@ openapi-cli -h
 
 Clear spec/authorization cache:
 ```bash
-openapi-cli --invalidate-cache
+openapi-cli mngmt --invalidate-cache
+```
+
+Enable debug logging:
+```bash
+openapi-cli <arg1> <arg2> --debug
+```
+
+Enable color output:
+```bash
+pip install pygments
+
+openapi-cli <arg1> <arg2> --color
 ```
 
 ## How to generate a CLI-client stub:
