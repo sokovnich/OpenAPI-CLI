@@ -28,7 +28,17 @@ export OPENAPI_CLI_AUTH_PLUGIN='openapi_cli.auth.Decs3O'
 openapi-cli -h
 ```
 
-Clear spec/authorization cache:
+Clear authorization cache:
+```bash
+openapi-cli mngmt --invalidate-auth-cache
+```
+
+Clear specification cache:
+```bash
+openapi-cli mngmt --invalidate-spec-cache
+```
+
+Clear all caches:
 ```bash
 openapi-cli mngmt --invalidate-cache
 ```

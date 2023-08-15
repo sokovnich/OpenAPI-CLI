@@ -69,6 +69,14 @@ def main():
             print('OpenAPI-CLI cache was successfully invalidated')
             cache.invalidate()
             sys.exit()
+        elif getattr(args, 'invalidate_auth_cache', False):
+            print('OpenAPI-CLI authorization cache was successfully invalidated')
+            cache.invalidate_auth()
+            sys.exit()
+        elif getattr(args, 'invalidate_spec_cache', False):
+            print('OpenAPI-CLI specification cache was successfully invalidated')
+            cache.invalidate_spec()
+            sys.exit()
 
         if getattr(args, 'debug', False):
             logging.getLogger().setLevel(logging.DEBUG)

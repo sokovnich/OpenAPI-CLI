@@ -11,12 +11,24 @@ def parse_args(specs):
     main_container.required = True
 
     setup_parser = main_container.add_parser('mngmt', help='OpenAPI-CLI management commands')
-    setup_parser.add_argument(
+    group = setup_parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
         '--invalidate-cache',
         help='Invalidate OpenAPI-CLI caches',
         action='store_true',
         dest='invalidate_cache',
-        required=True,
+    )
+    group.add_argument(
+        '--invalidate-auth-cache',
+        help='Invalidate OpenAPI-CLI authorization cache',
+        action='store_true',
+        dest='invalidate_auth_cache',
+    )
+    group.add_argument(
+        '--invalidate-spec-cache',
+        help='Invalidate OpenAPI-CLI specification cache',
+        action='store_true',
+        dest='invalidate_spec_cache',
     )
 
     base_path_map = {}
