@@ -3,7 +3,9 @@ import logging
 import requests
 import six
 
-from openapi_cli.auth.abstract import AbstractAuth, log_request_curl
+from openapi_cli.auth.abstract import (
+    AbstractAuth, OpenApiAuthException, log_request_curl
+)
 
 
 logger = logging.getLogger()
@@ -104,7 +106,8 @@ class Decs3O(AbstractAuth):
             headers={'Authorization': 'token {}'.format(token['access_token'])},
             verify=verify,
         )
-        assert response.status_code == 200, "Cannot get JWT"
+        if response.status_code != 200:
+            raise OpenApiAuthException("Cannot get JWT")
 
         return response.text
 
@@ -114,7 +117,8 @@ class Decs3O(AbstractAuth):
             headers={'Authorization': 'bearer {}'.format(self.id_token)},
             verify=self.verify,
         )
-        assert response.status_code == 200, "Cannot refresh JWT"
+        if response.status_code != 200:
+            raise OpenApiAuthException("Cannot refresh JWT")
 
         self.id_token = response.text
 
