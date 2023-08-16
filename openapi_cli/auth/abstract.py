@@ -7,6 +7,10 @@ import six
 input = six.moves.input
 
 
+class OpenApiAuthException(Exception):
+    pass
+
+
 @six.add_metaclass(abc.ABCMeta)
 class AbstractAuth(requests.auth.AuthBase):
     @abc.abstractmethod

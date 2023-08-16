@@ -7,6 +7,7 @@ import urllib3
 import requests
 import six
 
+from openapi_cli.auth.abstract import OpenApiAuthException
 from openapi_cli.cache import Cache
 from openapi_cli.parser import parse_args
 from openapi_cli.utils import import_object, highlight_json
@@ -83,7 +84,11 @@ def main():
 
         url = urlparse.urljoin(BASE_URL, args.path)
 
-        response = session.request(method=args.method, url=url, params=vars(args.kwargs) if hasattr(args, 'kwargs') else None)
+        try:
+            response = session.request(method=args.method, url=url, params=vars(args.kwargs) if hasattr(args, 'kwargs') else None)
+        except OpenApiAuthException as e:
+            cache.invalidate_auth()
+            raise e
 
         # update auth cache
         if cache.auth.get('kwargs', {}) != session.auth.kwargs:
