@@ -11,12 +11,24 @@ def parse_args(specs):
     main_container.required = True
 
     setup_parser = main_container.add_parser('mngmt', help='OpenAPI-CLI management commands')
-    setup_parser.add_argument(
+    group = setup_parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
         '--invalidate-cache',
         help='Invalidate OpenAPI-CLI caches',
         action='store_true',
         dest='invalidate_cache',
-        required=True,
+    )
+    group.add_argument(
+        '--invalidate-auth-cache',
+        help='Invalidate OpenAPI-CLI authorization cache',
+        action='store_true',
+        dest='invalidate_auth_cache',
+    )
+    group.add_argument(
+        '--invalidate-spec-cache',
+        help='Invalidate OpenAPI-CLI specification cache',
+        action='store_true',
+        dest='invalidate_spec_cache',
     )
 
     base_path_map = {}
@@ -62,6 +74,22 @@ def parse_args(specs):
                         required=param.get('required', False),
                         dest='kwargs.{}'.format(param['name'])
                     )
+
+                if 'requestBody' in method_spec and 'content' in method_spec['requestBody']:
+                    content = method_spec['requestBody']['content']
+                    for media_type, media_spec in content.items():
+                        if 'schema' in media_spec:
+                            schema = media_spec['schema']
+                            if schema.get('type') == 'object' and 'properties' in schema:
+                                required_fields = schema.get('required', [])
+                                for prop_name, prop_spec in schema['properties'].items():
+                                    group.add_argument(
+                                        '--{}'.format(prop_name),
+                                        help=prop_spec.get('description', ''),
+                                        required=(prop_name in required_fields),
+                                        dest='kwargs.{}'.format(prop_name)
+                                    )
+                            break
 
     args = main_parser.parse_args(namespace=Namespace())
     endpoint = (

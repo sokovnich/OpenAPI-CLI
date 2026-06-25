@@ -9,6 +9,8 @@ from openapi_cli.tests.specs import TEST_SPEC_YAML
 @pytest.mark.parametrize("sys_argv", [
     ['openapi-cli', 'get'],
     ['openapi-cli', 'mngmt', '--invalidate-cache'],
+    ['openapi-cli', 'mngmt', '--invalidate-auth-cache'],
+    ['openapi-cli', 'mngmt', '--invalidate-spec-cache'],
     ['openapi-cli', 'v2', 'get'],
     ['openapi-cli', 'v2', 'test', 'post', '--testId', '1'],
 ])
@@ -29,6 +31,8 @@ def test_parse_args_debug(monkeypatch, sys_argv):
 @pytest.mark.parametrize("sys_argv", [
     ['openapi-cli', 'get', '--dry-run'],
     ['openapi-cli', 'mngmt', '--invalidate-cache', '--dry-run'],
+    ['openapi-cli', 'mngmt', '--invalidate-auth-cache', '--dry-run'],
+    ['openapi-cli', 'mngmt', '--invalidate-spec-cache', '--dry-run'],
 ])
 def test_parse_args_dry_run(monkeypatch, sys_argv):
     monkeypatch.setattr('sys.argv', sys_argv)

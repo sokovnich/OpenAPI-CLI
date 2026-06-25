@@ -7,6 +7,7 @@ import urllib3
 import requests
 import six
 
+from openapi_cli.auth.abstract import OpenApiAuthException
 from openapi_cli.cache import Cache
 from openapi_cli.parser import parse_args
 from openapi_cli.utils import import_object, highlight_json
@@ -69,13 +70,25 @@ def main():
             print('OpenAPI-CLI cache was successfully invalidated')
             cache.invalidate()
             sys.exit()
+        elif getattr(args, 'invalidate_auth_cache', False):
+            print('OpenAPI-CLI authorization cache was successfully invalidated')
+            cache.invalidate_auth()
+            sys.exit()
+        elif getattr(args, 'invalidate_spec_cache', False):
+            print('OpenAPI-CLI specification cache was successfully invalidated')
+            cache.invalidate_spec()
+            sys.exit()
 
         if getattr(args, 'debug', False):
             logging.getLogger().setLevel(logging.DEBUG)
 
         url = urlparse.urljoin(BASE_URL, args.path)
 
-        response = session.request(method=args.method, url=url, params=vars(args.kwargs) if hasattr(args, 'kwargs') else None)
+        try:
+            response = session.request(method=args.method, url=url, params=vars(args.kwargs) if hasattr(args, 'kwargs') else None)
+        except OpenApiAuthException as e:
+            cache.invalidate_auth()
+            raise e
 
         # update auth cache
         if cache.auth.get('kwargs', {}) != session.auth.kwargs:

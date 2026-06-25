@@ -4,11 +4,11 @@
 
 OpenAPI-CLI is a CLI-client for any OpenAPI2.0-compatible API.
 
-Main features:
-* Dynamic CLI generation.
+Key features:
+* Runtime CLI generation.
 * Spec/authorization cache.
 * Pluggable authentication.
-* Python 2.7/3.5 support.
+* Python 2.7/3.5+ support.
 
 ## How to install:
 ```bash
@@ -28,7 +28,17 @@ export OPENAPI_CLI_AUTH_PLUGIN='openapi_cli.auth.Decs3O'
 openapi-cli -h
 ```
 
-Clear spec/authorization cache:
+Clear authorization cache:
+```bash
+openapi-cli mngmt --invalidate-auth-cache
+```
+
+Clear specification cache:
+```bash
+openapi-cli mngmt --invalidate-spec-cache
+```
+
+Clear all caches:
 ```bash
 openapi-cli mngmt --invalidate-cache
 ```
@@ -45,10 +55,6 @@ pip install pygments
 openapi-cli <arg1> <arg2> --color
 ```
 
-## How to generate a CLI-client stub:
-
-Using another tool like https://github.com/OpenAPITools
-
 ## How to implement custom authentication plugin:
 
 ```python
@@ -57,3 +63,7 @@ import openapi_cli.auth.abstract
 class MyAuth(openapi_cli.auth.abstract.AbstractAuth):
     ...
 ```
+
+## How to generate a CLI-client stub:
+
+Using another tool like https://github.com/OpenAPITools

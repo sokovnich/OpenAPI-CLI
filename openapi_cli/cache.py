@@ -20,7 +20,13 @@ class Cache:
         self.spec = shelve.open(self._cache_spec_path)
 
     def invalidate(self):
+        self.invalidate_auth()
+        self.invalidate_spec()
+
+    def invalidate_auth(self):
         self.auth.clear()
+
+    def invalidate_spec(self):
         self.spec.clear()
 
     def close(self):
