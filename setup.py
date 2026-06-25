@@ -43,7 +43,7 @@ class InstallBashCompletion(Command):
 
 setup(
     name='openapi-cli',
-    version='0.0.1',
+    version='0.0.2',
     python_requires='>=2.7',
     packages=find_packages(exclude=['*.tests', 'tests.*', 'tests', '*.tests.*']),
     author='Sokovnich Yan',
