@@ -75,6 +75,22 @@ def parse_args(specs):
                         dest='kwargs.{}'.format(param['name'])
                     )
 
+                if 'requestBody' in method_spec and 'content' in method_spec['requestBody']:
+                    content = method_spec['requestBody']['content']
+                    for media_type, media_spec in content.items():
+                        if 'schema' in media_spec:
+                            schema = media_spec['schema']
+                            if schema.get('type') == 'object' and 'properties' in schema:
+                                required_fields = schema.get('required', [])
+                                for prop_name, prop_spec in schema['properties'].items():
+                                    group.add_argument(
+                                        '--{}'.format(prop_name),
+                                        help=prop_spec.get('description', ''),
+                                        required=(prop_name in required_fields),
+                                        dest='kwargs.{}'.format(prop_name)
+                                    )
+                            break
+
     args = main_parser.parse_args(namespace=Namespace())
     endpoint = (
         tuple()
