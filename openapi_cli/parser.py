@@ -32,12 +32,12 @@ def parse_args(specs):
     )
 
     base_path_map = {}
+    entities = {}
     for spec in specs:
         base_path = spec.get('basePath', '/')
         endpoints = spec['paths']
         tags = {tag['name']: tag['description'] for tag in spec.get('tags', [])}
 
-        entities = {}
         for endpoint, endpoint_spec in endpoints.items():
             parsed_endpoint = (
                 tuple() if endpoint == '/'
